@@ -2,9 +2,20 @@
 const mongoose = require('mongoose');
 
 const promotionSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true }, // ex: "G1 Info"
-  academicYear: { type: String, required: true }, // ex: "2024-2025"
-  students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }]
+  level: { // Niveau d'études (ex : "L2")
+    type: String,
+    required: true,
+    enum: ['G1', 'G2', 'L1', 'L2', 'L3', 'M1', 'M2'], // Liste des niveaux possibles
+  },
+  name: { // Domaine d'études (ex : "Informatique")
+    type: String,
+    required: true,
+    trim: true,
+  },
+  academicYear: { // Année académique (ex : "2024-2025")
+    type: String,
+    required: true,
+  },
 });
 
-module.exports = mongoose.model("Promotion", promotionSchema);
+module.exports = mongoose.model('Promotion', promotionSchema);

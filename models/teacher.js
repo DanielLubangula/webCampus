@@ -6,7 +6,7 @@ const teacherSchema = new mongoose.Schema({
   fullName: String,
   email: { type: String, unique: true },
   password: String,
-  courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
+  courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }], // Référence au modèle Course
 });
 
 // Hash le mot de passe avant sauvegarde
