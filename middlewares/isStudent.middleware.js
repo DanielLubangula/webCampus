@@ -6,6 +6,7 @@ exports.verifyStudentToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
     if (decoded.role !== 'student') return res.status(403).json({ message: 'Accès refusé.' });
 
     req.student = decoded;

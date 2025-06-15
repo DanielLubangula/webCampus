@@ -7,19 +7,19 @@ const router = express.Router();
 // Route pour créer une promotion
 router.post('/', isAdmin, async (req, res) => {
   try {
-    const { level, name, academicYear } = req.body;
+    const {  name } = req.body;
 
-    if (!level || !name || !academicYear) {
-      return res.status(400).json({ message: 'Tous les champs sont requis.' });
+    if (!name ) {
+      return res.status(400).json({ message: 'le nom de la promotion est requis.' });
     }
 
     // Vérifier si une promotion avec le même niveau et domaine existe déjà
-    const existingPromotion = await Promotion.findOne({ level, name });
+    const existingPromotion = await Promotion.findOne({  name });
     if (existingPromotion) {
-      return res.status(400).json({ message: 'Une promotion avec ce niveau et domaine existe déjà.' });
+      return res.status(400).json({ message: 'Une promotion avec ce nom existe déjà.' });
     }
 
-    const promotion = new Promotion({ level, name, academicYear });
+    const promotion = new Promotion({  name });
     await promotion.save();
 
     res.status(201).json({ message: 'Promotion créée avec succès.', promotion });
@@ -56,15 +56,15 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { level, name, academicYear } = req.body;
+    const {  name } = req.body;
 
-    if (!level || !name || !academicYear) {
+    if ( !name) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
     const promotion = await Promotion.findByIdAndUpdate(
       id,
-      { level, name, academicYear },
+      {  name},
       { new: true }
     );
     if (!promotion) {

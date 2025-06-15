@@ -1,7 +1,46 @@
-const TP = require('../models/tp');
+const TP = require('../models/tp.model');
 const Teacher = require('../models/teacher');
 const Course = require('../models/course');
 const Promotion = require('../models/promotion');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+exports.loginTeacher = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Vérifier si l'email existe
+    const teacher = await Teacher.findOne({ email });
+    if (!teacher) {
+      return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+    }
+
+    // Vérifier le mot de passe
+    const isMatch = await bcrypt.compare(password, teacher.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+    }
+
+    // Générer un token JWT
+    const token = jwt.sign(
+      { id: teacher._id, role: 'teacher' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(200).json({
+      message: "Connexion réussie",
+      token,
+      teacher: {
+        id: teacher._id,
+        fullName: teacher.fullName,
+        email: teacher.email,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
+};
 
 exports.createTP = async (req, res) => {
   const { title, description, deadline, course, promotion, students } = req.body;

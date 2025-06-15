@@ -2,8 +2,13 @@ const express = require('express');
 const Teacher = require('../models/teacher');
 const Course = require('../models/course');
 const Reclamation = require('../models/reclamation');
+const { loginTeacher } = require('../controllers/teacher.controller');
+const isTeacher = require('../middlewares/isTeacher.middleware'); // Middleware pour vérifier si l'utilisateur est un enseignant
 
 const router = express.Router();
+
+// Route pour la connexion des professeurs
+router.post('/login', loginTeacher);
 
 // Route pour récupérer le tableau de bord de l'enseignant
 router.get('/:id/dashboard', async (req, res) => {
