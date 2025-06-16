@@ -31,6 +31,7 @@ app.use('/api/reclamation', require('./routes/reclamation.routes'));
 app.use('/api/deliberation', require('./routes/deliberation.routes'));
 app.use('/api/deliberation/admin', require('./routes/deliberationAdmin.routes'));
 app.use('/api/course', require('./routes/course.routes'));
+app.use('/api/contact', require('./routes/contact.routes'));
 // app.use('/api/journalier', require('./routes/journalier.route'));
 // app.use('/api/entreprise', require('./routes/entreprise.route'));
 // app.use('/api/candidature', require('./routes/candidature.route'));
