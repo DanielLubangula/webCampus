@@ -13,7 +13,7 @@ const assignmentSchema = new mongoose.Schema({
       filePath: String,
       submittedAt: Date,
     },
-  ],
+  ], 
 });
 
 module.exports = mongoose.model("Assignment", assignmentSchema);

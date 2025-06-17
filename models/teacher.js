@@ -6,6 +6,7 @@ const teacherSchema = new mongoose.Schema({
   fullName: String,
   email: { type: String, unique: true },
   password: String,
+  phone : String,
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }], // Référence au modèle Course
 });
 
