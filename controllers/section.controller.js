@@ -3,13 +3,13 @@ const Section = require('../models/section');
 // Créer une nouvelle section
 exports.createSection = async (req, res) => {
   try {
-    const { nom, description } = req.body;
+    const { name } = req.body;
 
-    if (!nom) {
-      return res.status(400).json({ message: 'Le nom de la section est requis.' });
+    if (!name) {
+      return res.status(400).json({ message: 'Le name de la section est requis.' });
     }
 
-    const section = new Section({ nom, description });
+    const section = new Section({ name });
     await section.save();
 
     res.status(201).json({ message: 'Section créée avec succès.', section });
@@ -19,6 +19,14 @@ exports.createSection = async (req, res) => {
 };
 
 // Récupérer toutes les sections
+exports.getAllSections = async (req, res) => {
+    try {
+        const sections = await Section.find({}, 'name'); // Récupère uniquement le champ 'name'
+        res.status(200).json(sections);
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur lors de la récupération des sections.', error: err.message });
+    }
+};
 exports.getAllSections = async (req, res) => {
   try {
     const sections = await Section.find();
@@ -48,13 +56,13 @@ exports.getSectionById = async (req, res) => {
 exports.updateSection = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, description } = req.body;
+    const { name } = req.body;
 
-    if (!nom) {
-      return res.status(400).json({ message: 'Le nom de la section est requis.' });
+    if (!name) {
+      return res.status(400).json({ message: 'Le name de la section est requis.' });
     }
 
-    const section = await Section.findByIdAndUpdate(id, { nom, description }, { new: true });
+    const section = await Section.findByIdAndUpdate(id, { name }, { new: true });
 
     if (!section) {
       return res.status(404).json({ message: 'Section non trouvée.' });
