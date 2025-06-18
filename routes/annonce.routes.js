@@ -6,13 +6,13 @@ const router = express.Router();
 // Route pour créer une nouvelle annonce
 router.post('/', async (req, res) => {
   try {
-    const { title, description, publishedAt } = req.body;
+    const { title, description } = req.body;
 
     if (!title || !description) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
-    const annonce = new Annonce({ title, description, publishedAt });
+    const annonce = new Annonce({ title, description });
     await annonce.save();
 
     res.status(201).json({ message: 'Annonce créée avec succès.', annonce });
