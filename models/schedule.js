@@ -1,26 +1,29 @@
 const mongoose = require('mongoose');
 
 const scheduleSchema = new mongoose.Schema({
-  promotion: { // Référence à la promotion
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Promotion',
-    required: true,
-    unique: true // Une promotion ne peut avoir qu'un seul horaire
-  },
-  level: { // Niveau d'études
+  jour: { // Jour de l'horaire (ex : "Lundi")
     type: String,
     required: true,
-    enum: ['G1', 'G2', 'L1', 'L2', 'L3', 'M1', 'M2'], // Liste des niveaux possibles
+    trim: true,
   },
-  courses: [ // Liste des cours dans l'horaire
-    {
-      day: { type: String, required: true }, // Jour du cours (ex : Lundi)
-      time: { type: String, required: true }, // Heure du cours (ex : 08:00 - 10:00)
-      title: { type: String, required: true }, // Titre du cours
-      teacher: { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' }, // Enseignant responsable
-      room: { type: String, required: true }, // Salle du cours
-    }
-  ]
-}, { timestamps: true });
+  heure_debut: { // Heure de début (ex : "08:00")
+    type: String,
+    required: true,
+  },
+  heure_fin: { // Heure de fin (ex : "10:00")
+    type: String,
+    required: true,
+  },
+  salle: { // Salle où le cours est donné (ex : "B201")
+    type: String,
+    required: true,
+    trim: true,
+  },
+  cours: { // Référence au modèle Course
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    required: true,
+  },
+});
 
 module.exports = mongoose.model('Schedule', scheduleSchema);

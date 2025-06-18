@@ -8,9 +8,9 @@ const promotionSchema = new mongoose.Schema({
     trim: true,
   },
   section: { // Section de la promotion (ex : "Informatique")
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Section',
     required: true,
-    trim: true,
   },
   faculty: { // Référence à la faculté
     type: mongoose.Schema.Types.ObjectId,

@@ -33,7 +33,12 @@ const studentSchema = new mongoose.Schema({
     required : true
   }
   ,
-  
+  level: { // Ajout du champ pour le niveau d'études
+    type: String,
+    required: true,
+    enum: ['G1', 'G2', 'L1', 'L2', 'L3', 'M1', 'M2'], // Liste des niveaux possibles
+    default: 'G1' // Niveau par défaut
+  }
 }, { timestamps: true });
 
 // Hashage du mot de passe avant enregistrement

@@ -1,48 +1,27 @@
 const express = require('express');
 const Schedule = require('../models/schedule');
-const isAdmin = require('../middlewares/isAdmin.middleware'); // Middleware pour vérifier si l'utilisateur est admin
+const Course = require('../models/course');
+const isAdmin = require('../middlewares/isAdmin.middleware');
+const Student = require('../models/student'); // Importer le modèle Student
 
 const router = express.Router();
 
-// Route pour créer ou modifier un horaire de cours
-/*ex json
-
-{
-  "promotion": "60d5f9b8c2a4f12d8c8e4b9e",
-  "level": "L2",
-  "courses": [
-    {
-      "day": "Lundi",
-      "time": "08:00 - 10:00",
-      "title": "Programmation Web",
-      "teacher": "60d5f9b8c2a4f12d8c8e4b9e",
-      "room": "B201"
-    },
-    {
-      "day": "Mercredi",
-      "time": "10:00 - 12:00",
-      "title": "Réseaux",
-      "teacher": "60d5f9b8c2a4f12d8c8e4b9e",
-      "room": "B103"
-    }
-  ]
-}
-*/
+// Route pour créer un horaire
 router.post('/', isAdmin, async (req, res) => {
   try {
-    const { promotion, level, courses } = req.body;
+    const { jour, heure_debut, heure_fin, salle, cours } = req.body;
 
-    if (!promotion || !level || !courses || courses.length === 0) {
+    if (!jour || !heure_debut || !heure_fin || !salle || !cours) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
-    // Vérifier si un horaire existe déjà pour cette promotion
-    const existingSchedule = await Schedule.findOne({ promotion });
-    if (existingSchedule) {
-      return res.status(400).json({ message: 'Un horaire existe déjà pour cette promotion.' });
+    // Vérifier si le cours existe
+    const course = await Course.findById(cours).populate('promotion');
+    if (!course) {
+      return res.status(404).json({ message: 'Cours non trouvé.' });
     }
 
-    const schedule = new Schedule({ promotion, level, courses });
+    const schedule = new Schedule({ jour, heure_debut, heure_fin, salle, cours });
     await schedule.save();
 
     res.status(201).json({ message: 'Horaire créé avec succès.', schedule });
@@ -51,40 +30,101 @@ router.post('/', isAdmin, async (req, res) => {
   }
 });
 
-// Route pour modifier un horaire existant
-router.put('/:id', isAdmin, async (req, res) => {
+
+// Route pour récupérer tous les horaires
+router.get('/',isAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-    const { courses } = req.body;
-
-    if (!courses || courses.length === 0) {
-      return res.status(400).json({ message: 'Les cours sont requis pour modifier l\'horaire.' });
-    }
-
-    const schedule = await Schedule.findByIdAndUpdate(id, { courses }, { new: true });
-    if (!schedule) {
-      return res.status(404).json({ message: 'Horaire non trouvé.' });
-    }
-
-    res.status(200).json({ message: 'Horaire modifié avec succès.', schedule });
+    const schedules = await Schedule.find().populate('cours');
+    res.status(200).json(schedules);
   } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la modification de l\'horaire.', error: err.message });
+    res.status(500).json({ message: 'Erreur lors de la récupération des horaires.', error: err.message });
   }
 });
 
-// Route pour récupérer l'horaire d'une promotion
-router.get('/:promotionId', async (req, res) => {
+// Route pour récupérer un horaire par ID
+router.get('/:id',isAdmin, async (req, res) => {
   try {
-    const { promotionId } = req.params;
+    const schedule = await Schedule.findById(req.params.id).populate('cours');
+    if (!schedule) {
+      return res.status(404).json({ message: 'Horaire non trouvé.' });
+    }
+    res.status(200).json(schedule);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération de l\'horaire.', error: err.message });
+  }
+});
 
-    const schedule = await Schedule.findOne({ promotion: promotionId }).populate('promotion').populate('courses.teacher');
+// Route pour mettre à jour un horaire
+router.put('/:id', isAdmin, async (req, res) => {
+  try {
+    const { jour, heure_debut, heure_fin, salle, cours } = req.body;
+
+    if (!jour || !heure_debut || !heure_fin || !salle || !cours) {
+      return res.status(400).json({ message: 'Tous les champs sont requis.' });
+    }
+
+    const course = await Course.findById(cours);
+    if (!course) {
+      return res.status(404).json({ message: 'Cours non trouvé.' });
+    }
+
+    const schedule = await Schedule.findByIdAndUpdate(
+      req.params.id,
+      { jour, heure_debut, heure_fin, salle, cours },
+      { new: true }
+    );
+
     if (!schedule) {
       return res.status(404).json({ message: 'Horaire non trouvé.' });
     }
 
-    res.status(200).json(schedule);
+    res.status(200).json({ message: 'Horaire mis à jour avec succès.', schedule });
   } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la récupération de l\'horaire.', error: err.message });
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'horaire.', error: err.message });
+  }
+});
+
+// Route pour supprimer un horaire
+router.delete('/:id', isAdmin, async (req, res) => {
+  try {
+    const schedule = await Schedule.findByIdAndDelete(req.params.id);
+    if (!schedule) {
+      return res.status(404).json({ message: 'Horaire non trouvé.' });
+    }
+    res.status(200).json({ message: 'Horaire supprimé avec succès.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la suppression de l\'horaire.', error: err.message });
+  }
+});
+
+const { verifyStudentToken } = require('../middlewares/isStudent.middleware'); // Middleware pour vérifier l'étudiant connecté
+
+// Route pour récupérer les horaires en fonction de l'étudiant connecté
+router.get('/student', verifyStudentToken, async (req, res) => {
+  try {
+    // Récupérer l'étudiant connecté
+    const student = await Student.findById(req.student.id).populate('promotion').populate('faculty');
+    if (!student) {
+      return res.status(404).json({ message: 'Étudiant non trouvé.' });
+    }
+
+    // Récupérer les horaires correspondant à la promotion et à la faculté de l'étudiant
+    const schedules = await Schedule.find()
+      .populate({
+        path: 'cours',
+        populate: {
+          path: 'promotion',
+          match: { _id: student.promotion._id },
+          populate: { path: 'faculty', match: { _id: student.faculty._id } },
+        },
+      });
+
+    // Filtrer les horaires pour lesquels la promotion et la faculté correspondent
+    const filteredSchedules = schedules.filter(schedule => schedule.cours.promotion && schedule.cours.promotion.faculty);
+
+    res.status(200).json(filteredSchedules);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des horaires.', error: err.message });
   }
 });
 

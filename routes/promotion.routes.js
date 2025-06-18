@@ -4,92 +4,69 @@ const isAdmin = require('../middlewares/isAdmin.middleware'); // Middleware pour
 
 const router = express.Router();
 
-// Route pour créer une promotion
+// Route pour créer une nouvelle promotion
 router.post('/', isAdmin, async (req, res) => {
   try {
-    const {  name } = req.body;
-
-    if (!name ) {
-      return res.status(400).json({ message: 'le nom de la promotion est requis.' });
-    }
-
-    // Vérifier si une promotion avec le même niveau et domaine existe déjà
-    const existingPromotion = await Promotion.findOne({  name });
-    if (existingPromotion) {
-      return res.status(400).json({ message: 'Une promotion avec ce nom existe déjà.' });
-    }
-
-    const promotion = new Promotion({  name });
+    const { nom, section, faculty } = req.body;
+    const promotion = new Promotion({ nom, section, faculty });
     await promotion.save();
-
-    res.status(201).json({ message: 'Promotion créée avec succès.', promotion });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la création de la promotion.', error: err.message });
+    res.status(201).json(promotion);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
 // Route pour récupérer toutes les promotions
 router.get('/', async (req, res) => {
   try {
-    const promotions = await Promotion.find();
+    const promotions = await Promotion.find().populate('faculty');
     res.status(200).json(promotions);
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des promotions.', error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Route pour récupérer une promotion par ID
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const promotion = await Promotion.findById(id);
+    const promotion = await Promotion.findById(req.params.id).populate('faculty');
     if (!promotion) {
-      return res.status(404).json({ message: 'Promotion non trouvée.' });
+      return res.status(404).json({ error: 'Promotion not found' });
     }
     res.status(200).json(promotion);
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la récupération de la promotion.', error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Route pour modifier une promotion
+// Route pour mettre à jour une promotion par ID
 router.put('/:id', isAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-    const {  name } = req.body;
-
-    if ( !name) {
-      return res.status(400).json({ message: 'Tous les champs sont requis.' });
-    }
-
+    const { nom, section, faculty } = req.body;
     const promotion = await Promotion.findByIdAndUpdate(
-      id,
-      {  name},
-      { new: true }
+      req.params.id,
+      { nom, section, faculty },
+      { new: true, runValidators: true }
     );
     if (!promotion) {
-      return res.status(404).json({ message: 'Promotion non trouvée.' });
+      return res.status(404).json({ error: 'Promotion not found' });
     }
-
-    res.status(200).json({ message: 'Promotion modifiée avec succès.', promotion });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la modification de la promotion.', error: err.message });
+    res.status(200).json(promotion);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
-// Route pour supprimer une promotion
+// Route pour supprimer une promotion par ID
 router.delete('/:id', isAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const promotion = await Promotion.findByIdAndDelete(id);
+    const promotion = await Promotion.findByIdAndDelete(req.params.id);
     if (!promotion) {
-      return res.status(404).json({ message: 'Promotion non trouvée.' });
+      return res.status(404).json({ error: 'Promotion not found' });
     }
-
-    res.status(200).json({ message: 'Promotion supprimée avec succès.' });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la suppression de la promotion.', error: err.message });
+    res.status(200).json({ message: 'Promotion deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
