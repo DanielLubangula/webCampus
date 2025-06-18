@@ -62,4 +62,45 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Route pour récupérer une annonce par son ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const annonce = await Annonce.findById(id);
+    if (!annonce) {
+      return res.status(404).json({ message: 'Annonce non trouvée.' });
+    }
+
+    res.status(200).json(annonce);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération de l\'annonce.', error: err.message });
+  }
+});
+
+// Route pour mettre à jour une annonce
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+
+    if (!title || !description) {
+      return res.status(400).json({ message: 'Tous les champs sont requis.' });
+    }
+
+    const annonce = await Annonce.findById(id);
+    if (!annonce) {
+      return res.status(404).json({ message: 'Annonce non trouvée.' });
+    }
+
+    annonce.title = title;
+    annonce.description = description;
+    await annonce.save();
+
+    res.status(200).json({ message: 'Annonce mise à jour avec succès.', annonce });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'annonce.', error: err.message });
+  }
+});
+
 module.exports = router;
