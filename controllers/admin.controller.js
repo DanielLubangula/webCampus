@@ -20,7 +20,7 @@ exports.login = (req, res) => {
     );
 
     return res.status(200).json({
-      role : "admin",
+      role: "admin",
       token
     });
   }
@@ -31,7 +31,7 @@ exports.login = (req, res) => {
 
 exports.registerStudent = async (req, res) => {
   try {
-    const { fullName, cardNumber, email, password,promotion, level } = req.body;
+    const { fullName, cardNumber, email, password, promotion, level } = req.body;
 
     // Vérification des champs
     if (!fullName || !cardNumber || !email || !password || !promotion || !level) {
@@ -268,7 +268,14 @@ exports.createCourse = async (req, res) => {
 // Obtenir la liste de tous les cours
 exports.getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().populate('promotion');
+    const courses = await Course.find()
+      .populate({
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      });
     if (!courses || courses.length === 0) {
       return res.status(404).json({ message: 'Aucun cours trouvé' });
     }
@@ -282,7 +289,14 @@ exports.getAllCourses = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const courseId = req.params.id;
-    const course = await Course.findById(courseId).populate('promotion');
+    const course = await Course.findById(courseId)
+      .populate({
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      });
     if (!course) {
       return res.status(404).json({ message: 'Cours non trouvé' });
     }
