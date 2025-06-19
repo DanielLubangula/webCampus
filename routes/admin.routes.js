@@ -53,4 +53,6 @@ router.post('/teachers/:id/courses', isAdmin, adminController.addCourseToTeacher
 // Retirer un cours d'un professeur
 router.delete('/teachers/:id/courses', isAdmin, adminController.removeCourseFromTeacher);
 
+router.post( '/', isAdmin, adminController.removeCourseFromTeacher);
+
 module.exports = router;
