@@ -65,7 +65,7 @@ exports.registerStudent = async (req, res) => {
 // Liste de tous les étudiants
 exports.getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find().select('-password');
+    const students = await Student.find().select('-password').populate('promotion').populate('faculty');
     res.status(200).json(students);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur' });
@@ -101,7 +101,7 @@ exports.updateStudent = async (req, res) => {
 exports.getStudentById = async (req, res) => {
   try {
     const studentId = req.params.id;
-    const student = await Student.findById(studentId).select('-password');
+    const student = await Student.findById(studentId).select('-password').populate('promotion').populate('faculty');
     if (!student) {
       return res.status(404).json({ message: 'Étudiant non trouvé' });
     }
