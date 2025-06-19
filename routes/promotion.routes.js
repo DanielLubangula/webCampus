@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
 // Route pour récupérer une promotion par ID
 router.get('/:id', async (req, res) => {
   try {
-    const promotion = await Promotion.findById(req.params.id).populate('faculty');
+    const promotion = await Promotion.findById(req.params.id).populate('faculty').populate('section');
     if (!promotion) {
       return res.status(404).json({ error: 'Promotion not found' });
     }

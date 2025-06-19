@@ -243,9 +243,9 @@ exports.removeCourseFromTeacher = async (req, res) => {
 // Créer un nouveau cours
 exports.createCourse = async (req, res) => {
   try {
-    const { title, description, credit, promotion } = req.body;
+    const { title, description, credits, promotion } = req.body;
 
-    if (!title || !credit) {
+    if (!title || !credits) {
       return res.status(400).json({ message: 'Le titre et le crédit sont obligatoires' });
     }
 
@@ -255,11 +255,12 @@ exports.createCourse = async (req, res) => {
       return res.status(409).json({ message: 'Ce titre de cours existe déjà' });
     }
 
-    const course = new Course({ title, description, credit, promotion });
+    const course = new Course({ title, description, credits, promotion });
     await course.save();
 
     res.status(201).json({ message: 'Cours créé avec succès', course });
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
