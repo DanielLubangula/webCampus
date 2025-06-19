@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
 // GET /me
 exports.getMe = async (req, res) => {
     try {
-        const student = await Student.findById(req.user.id).select('-password');
+        const student = await Student.findById(req.user.id).select('-password').populate('promotion').populate('faculty');
         if (!student) return res.status(404).json({ message: "Étudiant non trouvé" });
         res.json(student);
     } catch (err) {
