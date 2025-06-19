@@ -282,7 +282,7 @@ exports.getAllCourses = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const courseId = req.params.id;
-    const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId).populate('promotion');
     if (!course) {
       return res.status(404).json({ message: 'Cours non trouvé' });
     }
