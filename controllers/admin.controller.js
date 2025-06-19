@@ -31,10 +31,10 @@ exports.login = (req, res) => {
 
 exports.registerStudent = async (req, res) => {
   try {
-    const { fullName, cardNumber, email, password, promotion, level } = req.body;
+    const { fullName, cardNumber, email, password, promotion, faculty } = req.body;
 
     // Vérification des champs
-    if (!fullName || !cardNumber || !email || !password || !promotion || !level) {
+    if (!fullName || !cardNumber || !email || !password || !promotion || !faculty) {
       return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
     }
 
@@ -50,7 +50,7 @@ exports.registerStudent = async (req, res) => {
       email,
       password,
       promotion,
-      level
+      faculty
     });
 
     await newStudent.save();
