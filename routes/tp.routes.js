@@ -9,6 +9,7 @@ const router = express.Router();
 router.post('/', verifyTeacherToken, tpUpload.single('file'), async (req, res) => {
   try {
     const { title, description, promotion } = req.body;
+
     const file = req.file ? req.file.path : null;
 
     if (!title || !description || !promotion) {

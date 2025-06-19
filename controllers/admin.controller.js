@@ -113,7 +113,7 @@ exports.getStudentById = async (req, res) => {
         { path: 'section' }, // Récupérer les informations complètes de la section
         { path: 'faculty' }  // Récupérer les informations complètes de la faculté
       ]
-    });;
+    });
     if (!student) {
       return res.status(404).json({ message: 'Étudiant non trouvé' });
     }
