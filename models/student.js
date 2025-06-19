@@ -27,12 +27,8 @@ const studentSchema = new mongoose.Schema({
     ref: 'Promotion',
     required: true
   },
-  faculty : {
-    type : mongoose.Schema.Types.ObjectId,
-    ref : 'Faculty',
-    required : true
-  }
-  ,
+ 
+
   
 }, { timestamps: true });
 
