@@ -31,10 +31,10 @@ exports.login = (req, res) => {
 
 exports.registerStudent = async (req, res) => {
   try {
-    const { fullName, cardNumber, email, password, promotion, faculty } = req.body;
+    const { fullName, cardNumber, email, password, promotion } = req.body;
 
     // Vérification des champs
-    if (!fullName || !cardNumber || !email || !password || !promotion || !faculty) {
+    if (!fullName || !cardNumber || !email || !password || !promotion ) {
       return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
     }
 
@@ -50,7 +50,7 @@ exports.registerStudent = async (req, res) => {
       email,
       password,
       promotion,
-      faculty
+     
     });
 
     await newStudent.save();
@@ -65,7 +65,13 @@ exports.registerStudent = async (req, res) => {
 // Liste de tous les étudiants
 exports.getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find().select('-password').populate('promotion');
+    const students = await Student.find().select('-password').populate({
+      path: 'promotion',
+      populate: [
+        { path: 'section' }, // Récupérer les informations complètes de la section
+        { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+      ]
+    });;
     res.status(200).json(students);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur' });
@@ -101,7 +107,13 @@ exports.updateStudent = async (req, res) => {
 exports.getStudentById = async (req, res) => {
   try {
     const studentId = req.params.id;
-    const student = await Student.findById(studentId).select('-password').populate('promotion');
+    const student = await Student.findById(studentId).select('-password').populate({
+      path: 'promotion',
+      populate: [
+        { path: 'section' }, // Récupérer les informations complètes de la section
+        { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+      ]
+    });;
     if (!student) {
       return res.status(404).json({ message: 'Étudiant non trouvé' });
     }
