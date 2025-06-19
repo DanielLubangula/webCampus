@@ -17,9 +17,13 @@ router.post('/', isAdmin, async (req, res) => {
 });
 
 // Route pour récupérer toutes les promotions
+// Route pour récupérer toutes les promotions
 router.get('/', async (req, res) => {
   try {
-    const promotions = await Promotion.find().populate('faculty');
+    const promotions = await Promotion.find()
+      .populate('faculty') // Récupérer les informations liées à la faculté
+      .populate('section'); // Récupérer les informations liées à la section
+
     res.status(200).json(promotions);
   } catch (error) {
     res.status(500).json({ error: error.message });
