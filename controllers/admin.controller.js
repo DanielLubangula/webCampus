@@ -268,7 +268,10 @@ exports.createCourse = async (req, res) => {
 // Obtenir la liste de tous les cours
 exports.getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find();
+    const courses = await Course.find().populate('promotion');
+    if (!courses || courses.length === 0) {
+      return res.status(404).json({ message: 'Aucun cours trouvé' });
+    }
     res.status(200).json(courses);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur' });
