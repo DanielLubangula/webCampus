@@ -1,7 +1,7 @@
 const express = require('express');
 const Promotion = require('../models/promotion');
 const isAdmin = require('../middlewares/isAdmin.middleware'); // Middleware pour vérifier si l'utilisateur est admin
-
+const Student = require('../models/student');
 const router = express.Router();
 
 // Route pour créer une nouvelle promotion
@@ -71,6 +71,43 @@ router.delete('/:id', isAdmin, async (req, res) => {
     res.status(200).json({ message: 'Promotion deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Route pour récupérer tous les étudiants d'une promotion
+router.get('/student/:promotionId',isAdmin,  async (req, res) => {
+  try {
+    const { promotionId } = req.params;
+
+    // Récupérer les étudiants de la promotion spécifiée
+    const students = await Student.find({ promotion: promotionId }).populate('promotion').populate('faculty');
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({ message: 'Aucun étudiant trouvé pour cette promotion.' });
+    }
+
+    res.status(200).json(students);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des étudiants.', error: err.message });
+  }
+});
+
+// Route pour récupérer tous les étudiants d'une promotion et faculté
+router.get('/:promotionId/faculty/:facultyId',isAdmin, async (req, res) => {
+  try {
+    const { promotionId, facultyId } = req.params;
+
+    // Récupérer les étudiants correspondant à la promotion et la faculté spécifiées
+    const students = await Student.find({ promotion: promotionId, faculty: facultyId }).populate('promotion').populate('faculty');
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({ message: 'Aucun étudiant trouvé pour cette promotion et faculté.' });
+    }
+
+    res.status(200).json(students);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des étudiants.', error: err.message });
   }
 });
 
