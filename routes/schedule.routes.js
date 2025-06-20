@@ -21,28 +21,46 @@ router.post('/', isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Cours non trouvé.' });
     }
 
+    // Vérifier si le champ promotion est défini
+    if (!course.promotion) {
+      return res.status(400).json({ message: 'Le cours spécifié n\'a pas de promotion associée.' });
+    }
+
+
     const schedule = new Schedule({ jour, heure_debut, heure_fin, salle, cours });
     await schedule.save();
 
     res.status(201).json({ message: 'Horaire créé avec succès.', schedule });
   } catch (err) {
+    console.log('Erreur', err)
     res.status(500).json({ message: 'Erreur lors de la création de l\'horaire.', error: err.message });
   }
 });
 
 
 // Route pour récupérer tous les horaires
-router.get('/',isAdmin, async (req, res) => {
+router.get('/', isAdmin, async (req, res) => {
   try {
-    const schedules = await Schedule.find().populate('cours');
+    const schedules = await Schedule.find().populate({
+      path: 'cours',
+      populate: {
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      }
+    });
+
     res.status(200).json(schedules);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des horaires.', error: err.message });
+    console.log("Erreur", err)
   }
 });
 
 // Route pour récupérer un horaire par ID
-router.get('/:id',isAdmin, async (req, res) => {
+router.get('/:id', isAdmin, async (req, res) => {
   try {
     const schedule = await Schedule.findById(req.params.id).populate('cours');
     if (!schedule) {
@@ -103,7 +121,7 @@ const { verifyStudentToken } = require('../middlewares/isStudent.middleware'); /
 router.get('/student', verifyStudentToken, async (req, res) => {
   try {
     // Récupérer l'étudiant connecté
-    const student = await Student.findById(req.student.id).populate('promotion').populate('faculty');
+    const student = await Student.findById(req.student.id).populate('promotion');
     if (!student) {
       return res.status(404).json({ message: 'Étudiant non trouvé.' });
     }
@@ -115,9 +133,12 @@ router.get('/student', verifyStudentToken, async (req, res) => {
         populate: {
           path: 'promotion',
           match: { _id: student.promotion._id },
-          populate: { path: 'faculty', match: { _id: student.faculty._id } },
+          populate: { path: 'section', match: { _id: student.section._id } },
         },
       });
+    if (!schedules || schedules.length === 0) {
+      return res.status(404).json({ message: 'Aucun horaire trouvé pour cet étudiant.' });
+    }
 
     // Filtrer les horaires pour lesquels la promotion et la faculté correspondent
     const filteredSchedules = schedules.filter(schedule => schedule.cours.promotion && schedule.cours.promotion.faculty);

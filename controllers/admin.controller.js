@@ -34,7 +34,7 @@ exports.registerStudent = async (req, res) => {
     const { fullName, cardNumber, email, password, promotion } = req.body;
 
     // Vérification des champs
-    if (!fullName || !cardNumber || !email || !password || !promotion ) {
+    if (!fullName || !cardNumber || !email || !password || !promotion) {
       return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
     }
 
@@ -50,7 +50,7 @@ exports.registerStudent = async (req, res) => {
       email,
       password,
       promotion,
-     
+
     });
 
     await newStudent.save();
@@ -144,7 +144,18 @@ exports.registerTeacher = async (req, res) => {
 
 exports.getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().select('-password');
+    const teachers = await Teacher.find()
+      .select('-password')
+      .populate({
+        path: 'courses',
+        populate: {
+          path: 'promotion',
+          populate: [
+            { path: 'section' }, // Récupérer les informations complètes de la section
+            { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+          ]
+        }
+      });
     res.status(200).json(teachers);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur' });
