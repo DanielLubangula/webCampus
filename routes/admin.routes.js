@@ -58,4 +58,7 @@ router.post( '/', isAdmin, adminController.removeCourseFromTeacher);
 // Route pour récupérer les étudiants par promotion
 router.get('/students/promotion/:promotionId', isAdmin, adminController.getStudentPromotion);
 
+// Route pour récupérer les statistiques 
+router.get("/statistique", isAdmin, adminController.getStatistics);
+
 module.exports = router;

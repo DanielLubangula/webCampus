@@ -5,6 +5,9 @@ const Teacher = require('../models/teacher');
 
 const jwt = require('jsonwebtoken');
 const Course = require('../models/course');
+const Section = require('../models/section');
+const Faculty = require('../models/faculty');
+const TP = require('../models/tp.model');
 
 exports.login = (req, res) => {
   const { username, password } = req.body;
@@ -402,3 +405,28 @@ exports.deleteCourse = async (req, res) => {
   }
 };
 
+// ******************************************************
+//******************************************************* 
+//*******************************************************
+//*******************************************************
+
+// route pour obtenir les statistiques globales
+exports.getStatistics = async (req, res) => {
+  try {
+    const totalStudents = await Student.countDocuments();
+    const totalTeachers = await Teacher.countDocuments();
+    const totalSections = await Section.countDocuments();
+    const totalFaculties = await Faculty.countDocuments();
+    const totalTPs = await TP.countDocuments();
+
+    res.status(200).json({
+      totalStudents,
+      totalTeachers,
+      totalSections,
+      totalFaculties,
+      totalTPs
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur', error: err.message });
+  }
+};

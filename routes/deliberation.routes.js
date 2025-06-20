@@ -5,7 +5,7 @@ const { verifyStudentToken } = require('../middlewares/isStudent.middleware'); /
 
 const router = express.Router();
 
-// Route pour récupérer les délibérations de la promotion et du niveau de l'étudiant connecté
+// Route pour récupérer les délibérations de la promotion
 router.get('/', verifyStudentToken, async (req, res) => {
   try {
     // Récupérer l'étudiant connecté

@@ -8,20 +8,16 @@ const router = express.Router();
 // Route pour ajouter une délibération
 router.post('/', verifyAdminToken, async (req, res) => {
   try {
-    const { student, course, grade, credit } = req.body;
+    const { student, course, grade } = req.body;
 
-    if (!student || !course || !grade || !credit) {
+    if (!student || !course || !grade) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
-
-    const status = grade >= 10 ? 'Validé' : 'Échec'; // Déterminer le statut en fonction de la note
 
     const deliberation = new Deliberation({
       student,
       course,
-      grade,
-      credit,
-      status,
+      grade
     });
 
     await deliberation.save();
@@ -79,7 +75,21 @@ router.delete('/:id', verifyAdminToken, async (req, res) => {
 // Route pour récupérer toutes les délibérations
 router.get('/', verifyAdminToken, async (req, res) => {
   try {
-    const deliberations = await Deliberation.find().populate('student');
+    const deliberations = await Deliberation.find()
+      .populate({
+        path: 'student',
+        select: '-password' // Exclure le mot de passe des étudiants
+      })
+      .populate({
+        path: 'course',
+        populate: {
+          path: 'promotion',
+          populate: [
+            { path: 'section' }, // Récupérer les informations complètes de la section
+            { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+          ]
+        }
+      });
     res.status(200).json(deliberations);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des délibérations.', error: err.message });
