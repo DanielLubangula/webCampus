@@ -49,7 +49,7 @@ exports.registerStudent = async (req, res) => {
       cardNumber,
       email,
       password,
-      promotion,
+      promotion
 
     });
 
@@ -136,7 +136,11 @@ exports.registerTeacher = async (req, res) => {
   try {
     const teacher = new Teacher({ fullName, email, password, courses, phone });
     await teacher.save();
-    res.status(201).json({ message: "Professeur inscrit avec succès", teacher });
+
+      // Supprimer le mot de passe de l'objet avant de l'envoyer dans la réponse
+      const teacherWithoutPassword = await Teacher.findById(teacher._id).select('-password');
+
+    res.status(201).json({ message: "Professeur inscrit avec succès", teacherWithoutPassword });
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de l'inscription", error: err.message });
   }
