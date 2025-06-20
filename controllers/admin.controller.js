@@ -191,7 +191,18 @@ exports.updateTeacher = async (req, res) => {
 exports.getTeacherById = async (req, res) => {
   try {
     const teacherId = req.params.id;
-    const teacher = await Teacher.findById(teacherId).select('-password');
+    const teacher = await Teacher.findById(teacherId)
+    .select('-password')
+    .populate({
+      path: 'courses',
+      populate: {
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      }
+    });;
     if (!teacher) {
       return res.status(404).json({ message: 'Professeur non trouvé' });
     }
