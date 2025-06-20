@@ -292,7 +292,9 @@ exports.createCourse = async (req, res) => {
     // Vérifier si le titre existe déjà
     const titleExists = await Course.findOne({ title });
     if (titleExists) {
-      return res.status(409).json({ message: 'Ce titre de cours existe déjà' });
+      if (promotion == titleExists._id.toString()){
+        return res.status(409).json({ message: 'Ce titre de cours existe déjà dans cette promotion' });
+      }
     }
 
     const course = new Course({ title, description, credits, promotion });
