@@ -109,7 +109,7 @@ router.get('/:id', verifyAdminToken, async (req, res) => {
       }
     })
     .populate('course');
-    
+
     if (!deliberation) {
       return res.status(404).json({ message: 'Délibération non trouvée.' });
     }
@@ -117,6 +117,37 @@ router.get('/:id', verifyAdminToken, async (req, res) => {
     res.status(200).json(deliberation);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération de la délibération.', error: err.message });
+  }
+});
+
+// Route pour récupérer les délibérations par promotion
+router.get('/promotion/:promotionId', verifyAdminToken, async (req, res) => {
+  try {
+    const { promotionId } = req.params;
+
+    const deliberations = await Deliberation.find()
+      .populate({
+        path: 'student',
+        select: '-password',
+        populate: {
+          path: 'promotion',
+          match: { _id: promotionId }, // Filtrer par l'ID de la promotion
+          populate: [
+            { path: 'section' },
+            { path: 'faculty' }
+          ]
+        }
+      })
+      .populate('course');
+
+    // Filtrer les délibérations où la promotion correspond
+    const filteredDeliberations = deliberations.filter(deliberation => 
+      deliberation.student?.promotion?._id?.toString() === promotionId
+    );
+
+    res.status(200).json(filteredDeliberations);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des délibérations par promotion.', error: err.message });
   }
 });
 
