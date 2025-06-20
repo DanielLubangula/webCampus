@@ -32,17 +32,15 @@ router.post('/', verifyAdminToken, async (req, res) => {
 router.put('/:id', verifyAdminToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { course, grade, credit } = req.body;
+    const { course, grade, student } = req.body;
 
-    if (!course || !grade || !credit) {
+    if (!course || !grade || !student) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
-    const status = grade >= 10 ? 'Validé' : 'Échec'; // Déterminer le statut en fonction de la note
-
     const deliberation = await Deliberation.findByIdAndUpdate(
       id,
-      { course, grade, credit, status },
+      { course, grade, student },
       { new: true }
     );
 
@@ -78,10 +76,7 @@ router.get('/', verifyAdminToken, async (req, res) => {
     const deliberations = await Deliberation.find()
       .populate({
         path: 'student',
-        select: '-password' // Exclure le mot de passe des étudiants
-      })
-      .populate({
-        path: 'course',
+        select: '-password', // Exclure le mot de passe des étudiants
         populate: {
           path: 'promotion',
           populate: [
@@ -89,7 +84,8 @@ router.get('/', verifyAdminToken, async (req, res) => {
             { path: 'faculty' }  // Récupérer les informations complètes de la faculté
           ]
         }
-      });
+      })
+      .populate('course');
     res.status(200).json(deliberations);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des délibérations.', error: err.message });
@@ -101,7 +97,19 @@ router.get('/:id', verifyAdminToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deliberation = await Deliberation.findById(id).populate('student');
+    const deliberation = await Deliberation.findById(id).populate({
+      path: 'student',
+      select: '-password', // Exclure le mot de passe des étudiants
+      populate: {
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      }
+    })
+    .populate('course');
+    
     if (!deliberation) {
       return res.status(404).json({ message: 'Délibération non trouvée.' });
     }
