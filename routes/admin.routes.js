@@ -55,4 +55,7 @@ router.delete('/teachers/:id/courses', isAdmin, adminController.removeCourseFrom
 
 router.post( '/', isAdmin, adminController.removeCourseFromTeacher);
 
+// Route pour récupérer les étudiants par promotion
+router.get('/students/promotion/:promotionId', isAdmin, adminController.getStudentPromotion);
+
 module.exports = router;

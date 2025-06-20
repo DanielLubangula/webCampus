@@ -123,6 +123,33 @@ exports.getStudentById = async (req, res) => {
   }
 };
 
+// Route pour récupérer les étudiants par promotion
+exports.getStudentPromotion = async (req, res) => {
+  try {
+    const { promotionId } = req.params;
+
+    // Récupérer les étudiants ayant la promotion spécifiée
+    const students = await Student.find({ promotion: promotionId })
+      .select('-password') // Exclure le mot de passe des étudiants
+      .populate({
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      });
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({ message: 'Aucun étudiant trouvé pour cette promotion.' });
+    }
+
+    res.status(200).json(students);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des étudiants.', error: err.message });
+  }
+};
+
+
 // ******************************************************
 //*******************************************************
 //*******************************************************
