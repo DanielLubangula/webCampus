@@ -131,10 +131,10 @@ exports.getStudentById = async (req, res) => {
 // Gestion des enseignants  
 
 exports.registerTeacher = async (req, res) => {
-  const { fullName, email, password, courses } = req.body;
+  const { fullName, email, password, courses, phone } = req.body;
 
   try {
-    const teacher = new Teacher({ fullName, email, password, courses });
+    const teacher = new Teacher({ fullName, email, password, courses, phone });
     await teacher.save();
     res.status(201).json({ message: "Professeur inscrit avec succès", teacher });
   } catch (err) {
