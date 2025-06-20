@@ -285,7 +285,7 @@ exports.createCourse = async (req, res) => {
   try {
     const { title, description, credits, promotion } = req.body;
 
-    if (!title || !credits) {
+    if (!title || !credits || !promotion) {
       return res.status(400).json({ message: 'Le titre et le crédit sont obligatoires' });
     }
 
