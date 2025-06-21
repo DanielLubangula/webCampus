@@ -24,7 +24,7 @@ app.use('/api/stats', require('./routes/stats.routes'));
 app.use('/api/actualite', require('./routes/actualite.routes'));
 app.use('/api/annonce', require('./routes/annonce.routes'));
 app.use('/api/teacher', require('./routes/teacher.routes'));
-app.use('/api/tp', require('./routes/tp.routes'));
+app.use('/api/tp', require('./routes/tp.routes')); 
 app.use('/api/schedule', require('./routes/schedule.routes'));
 app.use('/api/promotion', require('./routes/promotion.routes'));
 app.use('/api/reclamation', require('./routes/reclamation.routes'));

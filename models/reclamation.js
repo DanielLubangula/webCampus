@@ -9,4 +9,4 @@ const reclamationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }, // Date de création
 });
 
-module.exports = mongoose.model('Reclamation', reclamationSchema);
+module.exports = mongoose.model('Reclamation', reclamationSchema); 
