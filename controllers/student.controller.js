@@ -6,13 +6,19 @@ const jwt = require('jsonwebtoken');
 exports.login = async (req, res) => {
     try {
         const { cardNumber, password } = req.body;
-        const student = await Student.findOne({ cardNumber });
+        const student = await Student.findOne({ cardNumber }).populate({
+            path : 'promotion',
+            populate : [
+                { path: 'section' }, // Récupérer les informations complètes de la section
+                { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+              ]
+        });
         if (!student) return res.status(401).json({ message: "Numéro de carte ou mot de passe incorrect" });
 
         const isMatch = await bcrypt.compare(password, student.password);
         if (!isMatch) return res.status(401).json({ message: "Numéro de carte ou mot de passe incorrect" });
 
-        const token = jwt.sign({ id: student._id , role : 'student'}, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: student._id , role : 'student', promotion : student.promotion}, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, student: { id: student._id, fullName: student.fullName, cardNumber: student.cardNumber, email: student.email, role : "student" } });
     } catch (err) {
         res.status(500).json({ message: "Erreur serveur" });
