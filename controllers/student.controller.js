@@ -13,7 +13,7 @@ exports.login = async (req, res) => {
         if (!isMatch) return res.status(401).json({ message: "Numéro de carte ou mot de passe incorrect" });
 
         const token = jwt.sign({ id: student._id , role : 'student'}, process.env.JWT_SECRET, { expiresIn: '7d' });
-        res.json({ token, student: { id: student._id, fullName: student.fullName, cardNumber: student.cardNumber, email: student.email } });
+        res.json({ token, student: { id: student._id, fullName: student.fullName, cardNumber: student.cardNumber, email: student.email, role : "student" } });
     } catch (err) {
         res.status(500).json({ message: "Erreur serveur" });
     }
