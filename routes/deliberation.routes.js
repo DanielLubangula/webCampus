@@ -14,7 +14,7 @@ router.get('/', verifyStudentToken, async (req, res) => {
       return res.status(404).json({ message: 'Étudiant non trouvé.' });
     }
 
-    // Récupérer les délibérations de la promotion et du niveau
+    // Récupérer les délibérations de la promotion et du   br
     const deliberations = await Deliberation.find()
       .populate('student')
       .populate({
