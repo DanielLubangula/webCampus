@@ -149,11 +149,22 @@ router.get('/me/reclamations', verifyTeacherToken, async (req, res) => {
     const teacherId = req.teacher.id; // L'ID du professeur est extrait du token
 
     // Récupérer les réclamations associées à l'enseignant
-    const reclamations = await Reclamation.find({ teacher: teacherId }).populate("student");
+    const reclamations = await Reclamation.find({ teacher: teacherId })
+      .populate({
+        path: 'student',
+        populate: {
+          path: 'promotion',
+          populate: [
+            { path: 'section' }, // Récupérer les informations complètes de la section
+            { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+          ]
+        }
+      });
 
     res.status(200).json(reclamations);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des réclamations.', error: err.message });
   }
 });
+
 module.exports = router;
