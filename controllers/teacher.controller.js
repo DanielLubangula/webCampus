@@ -36,7 +36,7 @@ exports.loginTeacher = async (req, res) => {
         fullName: teacher.fullName,
         email: teacher.email,
       },
-      role : "student" 
+      role : "teacher" 
     });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur", error: err.message });
