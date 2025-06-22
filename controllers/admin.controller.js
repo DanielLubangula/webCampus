@@ -173,6 +173,7 @@ exports.registerTeacher = async (req, res) => {
     res.status(201).json({ message: "Professeur inscrit avec succès", teacherWithoutPassword });
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de l'inscription", error: err.message });
+    console.log(err)
   }
 };
 

@@ -10,7 +10,8 @@ router.post('/', verifyTeacherToken, tpUpload.single('file'), async (req, res) =
   try {
     const { title, description, promotion } = req.body;
 
-    const file = req.file ? req.file.path : null;
+    // const file = req.file ? req.file.path : null;
+    const file = req.file ? `/uploads/tp/${req.file.filename}` : null
 
     if (!title || !description || !promotion) {
       return res.status(400).json({ message: 'Tous les champs requis doivent être remplis.' });

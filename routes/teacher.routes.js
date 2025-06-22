@@ -99,21 +99,44 @@ router.get('/me', verifyTeacherToken, async (req, res) => {
   try {
     const teacherId = req.teacher.id; // L'ID du professeur est extrait du token
 
-    // Récupérer les informations du professeur
-    const teacher = await Teacher.findById(teacherId);
+    // Récupérer les informations du professeur avec les cours peuplés
+    const teacher = await Teacher.findById(teacherId).populate({
+      path: 'courses',
+      populate: {
+        path: 'promotion',
+        populate: [
+          { path: 'section' }, // Récupérer les informations complètes de la section
+          { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+        ]
+      }
+    });
+
     if (!teacher) {
       return res.status(404).json({ message: 'Enseignant non trouvé.' });
     }
 
-    // Construire la réponse
+    // Construire la réponse enrichie
     const teacherInfo = {
+      _id: teacher._id,
       fullName: teacher.fullName,
       email: teacher.email,
       phone: teacher.phone,
       totalCourses: teacher.courses.length,
+      courses: teacher.courses.map(course => ({
+        _id: course._id,
+        title: course.title,
+        description: course.description,
+        credits: course.credits,
+        promotion: {
+          _id: course.promotion._id,
+          nom: course.promotion.nom,
+          section: course.promotion.section,
+          faculty: course.promotion.faculty,
+        },
+      })),
     };
 
-    res.status(200).json(teacher);
+    res.status(200).json(teacherInfo);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des informations du professeur.', error: err.message });
   }
