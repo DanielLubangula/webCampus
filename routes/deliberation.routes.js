@@ -52,7 +52,7 @@ router.get('/student/deliberation', verifyStudentToken, async (req, res) => {
     }
 
     // Récupérer la délibération pour l'étudiant connecté
-    const deliberation = await Deliberation.findOne({ student: student._id })
+    const deliberation = await Deliberation.find({ student: student._id })
       .populate('student', '-password') // Peupler les informations de l'étudiant sans le mot de passe
       .populate({
         path: 'course',
