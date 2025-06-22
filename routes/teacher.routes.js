@@ -149,7 +149,7 @@ router.get('/me/reclamations', verifyTeacherToken, async (req, res) => {
     const teacherId = req.teacher.id; // L'ID du professeur est extrait du token
 
     // Récupérer les réclamations associées à l'enseignant
-    const reclamations = await Reclamation.find({ teacher: teacherId });
+    const reclamations = await Reclamation.find({ teacher: teacherId }).populate("student");
 
     res.status(200).json(reclamations);
   } catch (err) {
