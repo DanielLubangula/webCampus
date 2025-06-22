@@ -16,10 +16,19 @@ router.get('/', verifyStudentToken, async (req, res) => {
 
     // Récupérer les délibérations de la promotion et du   br
     const deliberations = await Deliberation.find()
-      .populate('student')
       .populate({
         path: 'student',
-        match: { promotion: student.promotion._id, level: student.level },
+        match: { promotion: student.promotion._id }
+      })
+      .populate({
+        path: 'course',
+        populate: {
+          path: 'promotion',
+          populate: [
+            { path: 'section' }, // Récupérer les informations complètes de la section
+            { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+          ]
+        }
       });
 
     // Filtrer les délibérations pour la promotion et le niveau de l'étudiant
@@ -32,5 +41,40 @@ router.get('/', verifyStudentToken, async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la récupération des délibérations.', error: err.message });
   }
 });
+
+// Route pour récupérer une seule délibération pour l'étudiant connecté
+router.get('/student/deliberation', verifyStudentToken, async (req, res) => {
+  try {
+    // Récupérer l'étudiant connecté
+    const student = await Student.findById(req.student.id);
+    if (!student) {
+      return res.status(404).json({ message: 'Étudiant non trouvé.' });
+    }
+
+    // Récupérer la délibération pour l'étudiant connecté
+    const deliberation = await Deliberation.findOne({ student: student._id })
+      .populate('student', '-password') // Peupler les informations de l'étudiant sans le mot de passe
+      .populate({
+        path: 'course',
+        populate: {
+          path: 'promotion',
+          populate: [
+            { path: 'section' }, // Récupérer les informations complètes de la section
+            { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+          ]
+        }
+      });
+
+    if (!deliberation) {
+      return res.status(404).json({ message: 'Aucune délibération trouvée pour cet étudiant.' });
+    }
+
+    res.status(200).json(deliberation);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération de la délibération.', error: err.message });
+  }
+});
+
+
 
 module.exports = router;
