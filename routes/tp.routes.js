@@ -8,6 +8,7 @@ const router = express.Router();
 // Route pour publier un TP
 router.post('/', verifyTeacherToken, tpUpload.single('file'), async (req, res) => {
   try {
+    console.log('******** *  promotion   : ', req.body.promotion)
     const { title, description, promotion } = req.body;
 
     // const file = req.file ? req.file.path : null;
