@@ -12,6 +12,9 @@ router.get("/me", authMiddleware, studentController.getMe)
 // Modification du mot de passe d'un étudiant
 router.put("/me/password", authMiddleware, studentController.updatePassword)
 
+// Récupération de la liste des professeurs
+router.get("/professors", authMiddleware, studentController.getProfessors)
+
 // Suppression du compte d'un étudiant
 // router.delete("/me", authMiddleware, studentController.deleteMe)
 

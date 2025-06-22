@@ -68,6 +68,16 @@ exports.updatePassword = async (req, res) => {
     }
 };
 
+// GET /professors
+exports.getProfessors = async (req, res) => {
+    try {
+        const professors = await require('../models/teacher').find().select('-password');
+        res.json(professors);
+    } catch (err) {
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+};
+
 // DELETE /me
 // exports.deleteMe = async (req, res) => {
 //     try {
