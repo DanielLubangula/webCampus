@@ -80,14 +80,7 @@ router.get('/:id/courses', verifyTeacherToken, async (req, res) => {
       },
     }));
 
-    res.status(200).json({
-      teacher: {
-        fullName: teacher.fullName,
-        email: teacher.email,
-        phone: teacher.phone,
-      },
-      courses: enrichedCourses,
-    });
+    res.status(200).json(courses);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des cours.', error: err.message });
     console.log(err)
