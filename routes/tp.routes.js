@@ -31,6 +31,7 @@ router.post('/', verifyTeacherToken, tpUpload.single('file'), async (req, res) =
     res.status(201).json({ message: 'TP publié avec succès.', tp });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la publication du TP.', error: err.message });
+    console.log(err)
   }
 });
 
