@@ -119,4 +119,17 @@ router.get('/me', verifyTeacherToken, async (req, res) => {
   }
 });
 
+// Route pour récupérer toutes les réclamations de l'enseignant connecté
+router.get('/me/reclamations', verifyTeacherToken, async (req, res) => {
+  try {
+    const teacherId = req.teacher.id; // L'ID du professeur est extrait du token
+
+    // Récupérer les réclamations associées à l'enseignant
+    const reclamations = await Reclamation.find({ teacher: teacherId });
+
+    res.status(200).json(reclamations);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des réclamations.', error: err.message });
+  }
+});
 module.exports = router;
