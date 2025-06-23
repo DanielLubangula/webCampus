@@ -8,7 +8,7 @@ const router = express.Router();
 // Route pour publier un TP
 router.post('/', verifyTeacherToken, tpUpload.single('file'), async (req, res) => {
   try {
-    console.log('******** *  promotion   : ', req.body.promotion)
+    console.log('******** *  promotion   : ', req.body)
     const { title, description, promotion, deadline } = req.body;
 
     // const file = req.file ? req.file.path : null;
@@ -67,8 +67,8 @@ router.get('/:tpId', async (req, res) => {
 // Route pour récupérer tous les TPs liés à une promotion
 router.get('/promotion/:promotionId/section/:idnonutile', async (req, res) => {
   try {
-    const { id } = req.params;
-    const tps = await TP.find({ promotion: id })
+    const { promotionId } = req.params;
+    const tps = await TP.find({ promotion: promotionId })
       .populate('teacher') // Populate teacher information
       .populate({
         path: 'promotion',
