@@ -40,7 +40,7 @@ router.get('/', verifyStudentToken, async (req, res) => {
 });
 
 // Route pour récupérer une réclamation par ID
-router.get('/:id', verifyStudenToken, async (req, res) => {
+router.get('/:id', verifyStudentToken, async (req, res) => {
   try {
     const { id } = req.params;
     const reclamation = await Reclamation.findById(id).populate('teacher');
