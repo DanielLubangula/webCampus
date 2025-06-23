@@ -11,7 +11,7 @@ const tpSchema = new mongoose.Schema({
   file: { type: String }, // Chemin du fichier TP (facultatif)
   teacher: { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' }, // Enseignant qui a publié le TP
   createdAt: { type: Date, default: Date.now }, // Date de publication
-
+  deadline: { type: Date, required: true } // Date limite de dépôt ou remise du TP
 });
 
 module.exports = mongoose.model('TP', tpSchema);
