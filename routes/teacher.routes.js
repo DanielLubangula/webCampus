@@ -167,4 +167,33 @@ router.get('/me/reclamations', verifyTeacherToken, async (req, res) => {
   }
 });
 
+// Route pour récupérer les détails d'une réclamation spécifique
+router.get('/reclamations/:idReclamation', verifyTeacherToken, async (req, res) => {
+  try {
+    const { idReclamation } = req.params;
+
+    // Récupérer la réclamation par son ID
+    const reclamation = await Reclamation.findById(idReclamation)
+      .populate('teacher') // Peupler les informations du professeur
+      .populate({
+        path: 'student',
+        populate: {
+          path: 'promotion',
+          populate: [
+            { path: 'section' }, // Récupérer les informations complètes de la section
+            { path: 'faculty' }  // Récupérer les informations complètes de la faculté
+          ]
+        }
+      });
+
+    if (!reclamation) {
+      return res.status(404).json({ message: 'Réclamation non trouvée.' });
+    }
+
+    res.status(200).json(reclamation);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des détails de la réclamation.', error: err.message });
+  }
+});
+
 module.exports = router;
