@@ -81,7 +81,7 @@ router.get('/promotion/:promotionId/section/:idnonutile', async (req, res) => {
       return res.status(404).json({ message: 'Aucun TP trouvé pour cette promotion.' });
     }
 
-    res.status(200).json({ tps });
+    res.status(200).json( tps ); 
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des TPs.', error: err.message });
     console.log(err);
