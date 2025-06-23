@@ -65,7 +65,7 @@ router.get('/:tpId', async (req, res) => {
 });
 
 // Route pour récupérer tous les TPs liés à une promotion
-router.get('/promotion/:promotionId', async (req, res) => {
+router.get('/promotion/:promotionId/section/:idnonutile', async (req, res) => {
   try {
     const { id } = req.params;
     const tps = await TP.find({ promotion: id })
